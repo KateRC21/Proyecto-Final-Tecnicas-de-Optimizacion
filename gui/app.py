@@ -11,6 +11,8 @@ import pickle
 import sys
 from pathlib import Path
 import geopandas as gpd
+import subprocess
+import time
 
 # Agregar paths
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -75,6 +77,37 @@ st.markdown("""
 # ============================================================================
 # FUNCIONES DE CARGA DE DATOS
 # ============================================================================
+
+def ejecutar_preparar_datos():
+    """
+    Ejecuta el script preparar_datos.py para generar los datos necesarios.
+    Retorna True si fue exitoso, False si hubo error.
+    """
+    try:
+        # Importar directamente la función main de preparar_datos
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("preparar_datos", BASE_DIR / "preparar_datos.py")
+        preparar_datos = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(preparar_datos)
+        
+        # Ejecutar la función main
+        preparar_datos.main(force_download=False)
+        return True
+    except Exception as e:
+        st.error(f"❌ Error al generar datos: {e}")
+        import traceback
+        st.code(traceback.format_exc())
+        return False
+
+
+def verificar_datos_existen():
+    """Verifica si los archivos de datos existen"""
+    ruta_modelo = BASE_DIR / "data" / "processed" / "datos_modelo.pkl"
+    ruta_nodos = BASE_DIR / "data" / "processed" / "medellin_poblado_nodos.pkl"
+    ruta_aristas = BASE_DIR / "data" / "processed" / "medellin_poblado_aristas.pkl"
+    
+    return ruta_modelo.exists() and ruta_nodos.exists() and ruta_aristas.exists()
+
 
 @st.cache_data
 def cargar_datos_modelo():
@@ -142,7 +175,45 @@ def inicializar_session_state():
     
     # CARGA AUTOMÁTICA DE DATOS AL INICIO (solo una vez)
     if not st.session_state.inicializado:
-        with st.spinner('🔄 Cargando datos iniciales...'):
+        # Verificar si los datos existen
+        if not verificar_datos_existen():
+            # Los datos no existen, generarlos automáticamente
+            st.info("🔄 **Primera ejecución detectada**: Generando datos del mapa de Medellín...")
+            st.markdown("""
+            Este proceso solo ocurre la primera vez y puede tardar **3-5 minutos**. Incluye:
+            - 📥 Descarga del mapa de OpenStreetMap
+            - 🗺️ Procesamiento de calles y nodos
+            - 🚑 Generación de emergencias
+            - 💾 Guardado de datos procesados
+            
+            Por favor espera... ☕
+            """)
+            
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            status_text.text("📥 Descargando mapa de OpenStreetMap...")
+            progress_bar.progress(20)
+            
+            # Ejecutar preparar_datos.py
+            exito = ejecutar_preparar_datos()
+            
+            if exito:
+                progress_bar.progress(100)
+                status_text.text("✅ Datos generados exitosamente!")
+                time.sleep(1)
+                st.success("✅ **Datos generados correctamente**. Recargando aplicación...")
+                time.sleep(2)
+                st.rerun()  # Recargar la app para cargar los nuevos datos
+            else:
+                progress_bar.empty()
+                status_text.empty()
+                st.error("❌ Error al generar datos. Por favor revisa los logs arriba.")
+                st.session_state.inicializado = True
+                return
+        
+        # Cargar datos (ya sea que existían o se acaban de generar)
+        with st.spinner('🔄 Cargando datos...'):
             try:
                 # Cargar datos del modelo
                 st.session_state.datos_modelo = cargar_datos_modelo()
@@ -156,10 +227,11 @@ def inicializar_session_state():
                     st.session_state.inicializado = True
                 else:
                     st.session_state.datos_cargados = False
-                    st.error("⚠️ No se encontraron datos procesados. Ejecuta: `python preparar_datos.py`")
+                    st.error("⚠️ Error al cargar datos. Por favor intenta regenerar usando el botón en el sidebar.")
             except Exception as e:
                 st.error(f"❌ Error al cargar datos: {e}")
                 st.session_state.datos_cargados = False
+                st.session_state.inicializado = True
 
 
 # ============================================================================

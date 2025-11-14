@@ -80,9 +80,80 @@ def seccion_cargar_datos():
                     st.sidebar.error("❌ Error al recargar")
                 
                 st.rerun()
+        
+        # Botón adicional para regenerar datos desde cero
+        if st.sidebar.button("🔄 Regenerar Datos (OSM)", 
+                             use_container_width=True,
+                             help="Descarga datos frescos desde OpenStreetMap y regenera todo"):
+            regenerar_datos_completos()
     else:
         st.sidebar.error("❌ No hay datos disponibles")
-        st.sidebar.warning("Ejecuta: `python preparar_datos.py`")
+        st.sidebar.warning("Los datos se generarán automáticamente")
+        
+        # Botón para generar datos manualmente
+        if st.sidebar.button("📥 Generar Datos Ahora", 
+                             use_container_width=True,
+                             type="primary"):
+            generar_datos_manualmente()
+
+
+def generar_datos_manualmente():
+    """Genera los datos manualmente cuando el usuario lo solicita"""
+    st.sidebar.info("🔄 Generando datos...")
+    st.sidebar.caption("Esto puede tardar 3-5 minutos")
+    
+    with st.spinner("📥 Descargando y procesando datos..."):
+        from gui.app import ejecutar_preparar_datos
+        import time
+        
+        exito = ejecutar_preparar_datos()
+        
+        if exito:
+            st.sidebar.success("✅ Datos generados correctamente!")
+            time.sleep(1)
+            st.rerun()
+        else:
+            st.sidebar.error("❌ Error al generar datos")
+
+
+def regenerar_datos_completos():
+    """Regenera todos los datos desde cero (descarga fresca de OSM)"""
+    st.sidebar.warning("⚠️ Esto descargará datos frescos de OpenStreetMap")
+    st.sidebar.caption("Puede tardar 5-10 minutos")
+    
+    with st.spinner("📥 Descargando mapa de OpenStreetMap..."):
+        import sys
+        from pathlib import Path
+        import time
+        
+        # Agregar path del proyecto
+        BASE_DIR = Path(__file__).resolve().parent.parent.parent
+        sys.path.insert(0, str(BASE_DIR))
+        
+        try:
+            # Importar y ejecutar preparar_datos con force_download
+            import importlib.util
+            spec = importlib.util.spec_from_file_location("preparar_datos", BASE_DIR / "preparar_datos.py")
+            preparar_datos = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(preparar_datos)
+            
+            # Ejecutar con force_download=True
+            preparar_datos.main(force_download=True)
+            
+            st.sidebar.success("✅ Datos regenerados desde OSM!")
+            time.sleep(1)
+            
+            # Limpiar caché y recargar
+            from gui.app import cargar_datos_modelo, cargar_geodataframes
+            cargar_datos_modelo.clear()
+            cargar_geodataframes.clear()
+            
+            st.rerun()
+            
+        except Exception as e:
+            st.sidebar.error(f"❌ Error: {e}")
+            import traceback
+            st.sidebar.code(traceback.format_exc())
 
 
 def seccion_emergencias():
