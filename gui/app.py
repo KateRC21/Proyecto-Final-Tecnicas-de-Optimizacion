@@ -201,10 +201,27 @@ def inicializar_session_state():
             if exito:
                 progress_bar.progress(100)
                 status_text.text("✅ Datos generados exitosamente!")
-                time.sleep(1)
-                st.success("✅ **Datos generados correctamente**. Recargando aplicación...")
-                time.sleep(2)
-                st.rerun()  # Recargar la app para cargar los nuevos datos
+                
+                # Limpiar caché de funciones de carga
+                cargar_datos_modelo.clear()
+                cargar_geodataframes.clear()
+                
+                # Cargar los nuevos datos inmediatamente
+                status_text.text("📥 Cargando datos generados...")
+                st.session_state.datos_modelo = cargar_datos_modelo()
+                st.session_state.gdf_nodos, st.session_state.gdf_aristas = cargar_geodataframes()
+                
+                # Verificar que se cargaron
+                if st.session_state.datos_modelo and st.session_state.gdf_aristas is not None:
+                    st.session_state.datos_cargados = True
+                    st.session_state.inicializado = True
+                    st.success("✅ **¡Datos listos!** Recargando interfaz...")
+                    time.sleep(2)
+                    st.rerun()  # Recargar la app para actualizar la UI
+                else:
+                    st.error("⚠️ Datos generados pero hubo error al cargarlos. Recarga la página manualmente (F5).")
+                    st.session_state.inicializado = True
+                    return
             else:
                 progress_bar.empty()
                 status_text.empty()
@@ -241,6 +258,18 @@ def inicializar_session_state():
 def mostrar_tab_inicio():
     """Tab de inicio con información general"""
     st.header("Bienvenido al Sistema de Optimización")
+    
+    # Mensaje de solución si hay inconsistencia
+    if verificar_datos_existen() and not st.session_state.get('datos_cargados', False):
+        st.warning("""
+        ⚠️ **Inconsistencia detectada:** Los archivos existen pero no están cargados en memoria.
+        
+        **Solución rápida:** 
+        1. Ve al **Panel de Control** (sidebar izquierdo) 
+        2. Click en **"📥 Generar Datos Ahora"**
+        
+        O simplemente **recarga la página** (F5 o Ctrl+R)
+        """)
     
     col1, col2 = st.columns(2)
     

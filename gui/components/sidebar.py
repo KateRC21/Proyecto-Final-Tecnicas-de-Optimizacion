@@ -103,15 +103,28 @@ def generar_datos_manualmente():
     st.sidebar.caption("Esto puede tardar 3-5 minutos")
     
     with st.spinner("📥 Descargando y procesando datos..."):
-        from gui.app import ejecutar_preparar_datos
+        from gui.app import ejecutar_preparar_datos, cargar_datos_modelo, cargar_geodataframes
         import time
         
         exito = ejecutar_preparar_datos()
         
         if exito:
-            st.sidebar.success("✅ Datos generados correctamente!")
-            time.sleep(1)
-            st.rerun()
+            # Limpiar caché y cargar datos inmediatamente
+            cargar_datos_modelo.clear()
+            cargar_geodataframes.clear()
+            
+            st.session_state.datos_modelo = cargar_datos_modelo()
+            st.session_state.gdf_nodos, st.session_state.gdf_aristas = cargar_geodataframes()
+            
+            # Verificar que se cargaron correctamente
+            if st.session_state.datos_modelo and st.session_state.gdf_aristas is not None:
+                st.session_state.datos_cargados = True
+                st.session_state.inicializado = True
+                st.sidebar.success("✅ Datos generados y cargados correctamente!")
+                time.sleep(1)
+                st.rerun()
+            else:
+                st.sidebar.error("⚠️ Datos generados pero error al cargar. Presiona F5 para recargar.")
         else:
             st.sidebar.error("❌ Error al generar datos")
 
