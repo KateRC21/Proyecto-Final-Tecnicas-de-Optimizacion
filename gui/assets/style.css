@@ -1,0 +1,238 @@
+/* gui/assets/style.css */
+/* Estilos personalizados para la aplicación Streamlit */
+
+/*
+PROPÓSITO:
+-----------
+Personaliza la apariencia de la aplicación Streamlit.
+Para aplicar estos estilos, usar en app.py:
+
+with open('gui/assets/style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
+SECCIONES:
+-----------
+1. Tema general
+2. Sidebar
+3. Botones
+4. Métricas (KPIs)
+5. Tablas
+6. Mapas
+7. Alertas
+*/
+
+/* ==================== */
+/* 1. TEMA GENERAL      */
+/* ==================== */
+
+/* Cambiar fuente principal */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Título principal */
+h1 {
+    color: #1f77b4;
+    font-weight: 700;
+    padding-bottom: 1rem;
+    border-bottom: 3px solid #1f77b4;
+}
+
+/* Subtítulos */
+h2, h3 {
+    color: #2c3e50;
+}
+
+/* ==================== */
+/* 2. SIDEBAR           */
+/* ==================== */
+
+/* Fondo del sidebar */
+[data-testid="stSidebar"] {
+    background-color: #f8f9fa;
+}
+
+/* Título del sidebar */
+[data-testid="stSidebar"] h1 {
+    color: #1f77b4;
+    font-size: 1.5rem;
+}
+
+/* ==================== */
+/* 3. BOTONES           */
+/* ==================== */
+
+/* Botón primario */
+.stButton > button[kind="primary"] {
+    background-color: #1f77b4;
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.stButton > button[kind="primary"]:hover {
+    background-color: #155a8a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Botones secundarios */
+.stButton > button {
+    border-radius: 8px;
+    font-weight: 500;
+}
+
+/* ==================== */
+/* 4. MÉTRICAS (KPIs)   */
+/* ==================== */
+
+/* Cards de métricas */
+[data-testid="stMetricValue"] {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f77b4;
+}
+
+[data-testid="stMetricLabel"] {
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    font-weight: 600;
+}
+
+/* Delta (cambio) */
+[data-testid="stMetricDelta"] {
+    font-size: 0.85rem;
+}
+
+/* ==================== */
+/* 5. TABLAS            */
+/* ==================== */
+
+/* Encabezados de tabla */
+.dataframe thead th {
+    background-color: #1f77b4;
+    color: white;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Filas alternadas */
+.dataframe tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+}
+
+/* Hover en filas */
+.dataframe tbody tr:hover {
+    background-color: #e3f2fd;
+}
+
+/* ==================== */
+/* 6. MAPAS             */
+/* ==================== */
+
+/* Contenedor del mapa */
+.folium-map {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* ==================== */
+/* 7. ALERTAS           */
+/* ==================== */
+
+/* Alerta de éxito */
+.stSuccess {
+    background-color: #d4edda;
+    border-left: 4px solid #28a745;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+/* Alerta de error */
+.stError {
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+/* Alerta de advertencia */
+.stWarning {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+/* Alerta de información */
+.stInfo {
+    background-color: #d1ecf1;
+    border-left: 4px solid #17a2b8;
+    padding: 1rem;
+    border-radius: 4px;
+}
+
+/* ==================== */
+/* 8. TABS              */
+/* ==================== */
+
+/* Pestañas */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    border-radius: 8px 8px 0 0;
+    padding: 10px 20px;
+    font-weight: 600;
+}
+
+/* Tab activo */
+.stTabs [aria-selected="true"] {
+    background-color: #1f77b4;
+    color: white;
+}
+
+/* ==================== */
+/* 9. INPUTS            */
+/* ==================== */
+
+/* Number inputs, sliders, etc. */
+.stNumberInput, .stSlider {
+    padding: 0.5rem 0;
+}
+
+/* ==================== */
+/* 10. EXPANDERS        */
+/* ==================== */
+
+/* Expanders (secciones colapsables) */
+.streamlit-expanderHeader {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    font-weight: 600;
+}
+
+/* ==================== */
+/* 11. FOOTER           */
+/* ==================== */
+
+/* Ocultar "Made with Streamlit" (opcional) */
+footer {
+    visibility: hidden;
+}
+
+/* O personalizarlo */
+footer:after {
+    content:'Desarrollado por [Tu Nombre] - UPB 2024'; 
+    visibility: visible;
+    display: block;
+    position: relative;
+    padding: 5px;
+    top: 2px;
+    text-align: center;
+    color: #7f8c8d;
+}
+

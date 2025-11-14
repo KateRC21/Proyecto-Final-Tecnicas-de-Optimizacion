@@ -1,0 +1,4 @@
+# Este archivo mantiene el directorio en Git
+# Aquí se guardará el grafo de Medellín en formato .graphml
+# para evitar descargarlo cada vez desde OSM
+

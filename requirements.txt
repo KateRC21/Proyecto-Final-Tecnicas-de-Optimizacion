@@ -1,0 +1,38 @@
+# Optimización
+pulp>=2.7.0
+# gurobi>=10.0.0  # Descomentar si se usa licencia académica de Gurobi
+
+# Grafos y Mapas
+osmnx>=1.6.0
+networkx>=3.0
+geopandas>=0.14.0
+
+# Visualización
+folium>=0.15.0
+plotly>=5.18.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Interfaz Gráfica
+streamlit>=1.29.0
+streamlit-folium>=0.15.0
+
+# Utilidades
+numpy>=1.24.0
+pandas>=2.1.0
+scipy>=1.11.0
+scikit-learn>=1.3.0
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Jupyter (opcional para notebooks)
+jupyter>=1.0.0
+ipykernel>=6.27.0
+ipywidgets>=8.1.0
+
+# Logging y Configuración
+python-dotenv>=1.0.0
+pyyaml>=6.0.1
+
